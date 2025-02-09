@@ -1,7 +1,9 @@
 services:
   backend:
-    image: myhttp:v7
-    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: myhttp
     environment:
       - 'port=8080'
       - 'DB_HOST=db'
@@ -21,7 +23,10 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
   pinger:
-    image: pinger:v7
+    build:
+      context: ./pinger
+      dockerfile: Dockerfile
+    image: pinger
     container_name: pinger
     environment:
       BACKEND_API_URL: "http://backend:8080/api/v1/setAll"
@@ -38,6 +43,16 @@ services:
       - ./migrations:/migrations  # Путь к вашим миграциям на хосте
     entrypoint: [ "/bin/sh", "-c", "until nc -z -v -w30 db 5432; do echo 'Waiting for PostgreSQL to be ready...'; sleep 1; done; migrate -path /migrations -database 'postgres://postgres:somepassword@db:5432/postgres?sslmode=disable' up" ]
     restart: "no"
+  frontend:
+    build:
+      context: ./pinger-ui
+      dockerfile: Dockerfile
+    image: pinger-vite-app
+    container_name: frontend
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
 
 volumes:
   migrations:

@@ -26,7 +26,7 @@ func MustEnvConfig() Config {
 	env := os.Getenv("env")
 	if env == "" {
 		env = "local"
-		return Config{
+		/*return Config{
 			App{
 				env,
 				"8080",
@@ -38,7 +38,7 @@ func MustEnvConfig() Config {
 				"",
 				"postgres",
 			},
-		}
+		}*/
 	}
 
 	port := os.Getenv("port")
