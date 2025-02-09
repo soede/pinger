@@ -1,0 +1,43 @@
+services:
+  backend:
+    image: myhttp:v7
+    container_name: backend
+    environment:
+      - 'port=8080'
+      - 'DB_HOST=db'
+      - 'DB_PORT=5432'
+      - 'DB_USER=postgres'
+      - 'DB_PASSWORD=somepassword'
+      - 'DB_NAME=postgres'
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
+    depends_on:
+      - db
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: somepassword
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+  pinger:
+    image: pinger:v7
+    container_name: pinger
+    environment:
+      BACKEND_API_URL: "http://backend:8080/api/v1/setAll"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - backend
+  migrate:
+    image: migrate/migrate:latest
+    container_name: migrate
+    depends_on:
+      - db
+    volumes:
+      - ./migrations:/migrations  # Путь к вашим миграциям на хосте
+    entrypoint: [ "/bin/sh", "-c", "until nc -z -v -w30 db 5432; do echo 'Waiting for PostgreSQL to be ready...'; sleep 1; done; migrate -path /migrations -database 'postgres://postgres:somepassword@db:5432/postgres?sslmode=disable' up" ]
+    restart: "no"
+
+volumes:
+  migrations:
