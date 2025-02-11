@@ -1,44 +1,64 @@
 package config
 
 import (
+	"docker/pkg/utils"
+	"fmt"
+	"gopkg.in/yaml.v3"
 	"os"
 )
 
+const configPath = "config.yml"
+
 type Config struct {
-	App
-	DB
+	App `yaml:"app"`
+	DB  `yaml:"db"`
 }
 
 type App struct {
-	EnvName string
-	Port    string
+	EnvName      string `yaml:"env_name"`
+	Port         string `yaml:"port"`
+	ReadTimeout  int    `yaml:"readTimeout"`
+	WriteTimeout int    `yaml:"writeTimeout"`
 }
 
 type DB struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Name     string
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Name     string `yaml:"name"`
 }
 
-func MustEnvConfig() Config {
+func LoadConfig() *Config {
+
+	if utils.FileExists(configPath) {
+		fmt.Println("Loading config from", configPath)
+		return loadFromFile(configPath)
+	} else {
+
+	}
+	fmt.Println("Config file not found. Loading from environment variables.")
+	return mustEnvConfig()
+}
+
+func loadFromFile(path string) *Config {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		panic(fmt.Sprintf("Error reading config file: %v", err))
+	}
+
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		panic(fmt.Sprintf("Error parsing YAML: %v", err))
+	}
+
+	return &cfg
+}
+
+func mustEnvConfig() *Config {
 	env := os.Getenv("env")
 	if env == "" {
 		env = "local"
-		/*return Config{
-			App{
-				env,
-				"8080",
-			},
-			DB{
-				"localhost",
-				"5432",
-				"postgres",
-				"",
-				"postgres",
-			},
-		}*/
 	}
 
 	port := os.Getenv("port")
@@ -68,10 +88,12 @@ func MustEnvConfig() Config {
 		panic("DB_NAME should be defined in env configuration")
 	}
 
-	return Config{
+	return &Config{
 		App{
 			env,
 			port,
+			5,
+			5,
 		},
 		DB{
 			host,

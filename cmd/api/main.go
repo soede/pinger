@@ -2,27 +2,27 @@ package main
 
 import (
 	"docker/internal/config"
+	log "docker/internal/logger"
 	"docker/internal/server"
 	"docker/pkg/db/postgres"
+	"fmt"
 	"log/slog"
 	"os"
 )
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
-
-	cfg := config.MustEnvConfig()
-
-	db, err := postgres.NewPsqlDB(&cfg)
+	cfg := config.LoadConfig()
+	slog.SetDefault(log.NewLogger(cfg))
+	slog.Debug(fmt.Sprintf("ReadTimeout: %d, WriteTimeout: %d", cfg.ReadTimeout, cfg.WriteTimeout))
+	db, err := postgres.NewPsqlDB(cfg)
 	if err != nil {
 		slog.Error("failed DB init", "Error: ", err)
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	s := server.NewServer(&cfg, db, *logger)
+	s := server.NewServer(cfg, db)
 	if err = s.Run(); err != nil {
-		logger.Info("not ok")
+		slog.Error("not ok")
 	}
 }

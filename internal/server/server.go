@@ -13,36 +13,41 @@ import (
 )
 
 type Server struct {
-	mux    *http.ServeMux
-	cfg    *config.Config
-	db     *sqlx.DB
-	logger slog.Logger
+	mux *http.ServeMux
+	cfg *config.Config
+	db  *sqlx.DB
 }
 
 const (
-	maxHeaderBytes = 1 << 20
-	readTimeout    = 5
-	writeTimeout   = 5
+	maxHeaderBytes = 1 << 16
 	ctxTimeout     = 5
 )
 
-func NewServer(cfg *config.Config, db *sqlx.DB, logger slog.Logger) *Server {
-	return &Server{http.NewServeMux(), cfg, db, logger}
+func NewServer(cfg *config.Config, db *sqlx.DB) *Server {
+	return &Server{http.NewServeMux(), cfg, db}
 }
 
 func (s *Server) Run() error {
+	var writeTimeout, readTimeout = 5, 5
+	if s.cfg.WriteTimeout != 0 {
+		writeTimeout = s.cfg.WriteTimeout
+	}
+	if s.cfg.App.ReadTimeout != 0 {
+		writeTimeout = s.cfg.ReadTimeout
+	}
+
 	server := &http.Server{
 		Addr:           ":" + s.cfg.App.Port,
 		Handler:        s.mux,
-		ReadTimeout:    readTimeout * time.Second,
-		WriteTimeout:   writeTimeout * time.Second,
+		ReadTimeout:    time.Duration(readTimeout) * time.Second,
+		WriteTimeout:   time.Duration(writeTimeout) * time.Second,
 		MaxHeaderBytes: maxHeaderBytes,
 	}
 
 	go func() {
-		s.logger.Info("Server is listening on PORT", slog.String("port", s.cfg.App.Port))
+		slog.Info("Server is listening on PORT", slog.String("port", s.cfg.App.Port))
 		if err := server.ListenAndServe(); err != nil {
-			s.logger.Error("Error starting Server: ", slog.String("error", err.Error()))
+			slog.Error("Error starting Server: ", slog.String("error", err.Error()))
 			os.Exit(1)
 		}
 	}()
@@ -62,7 +67,7 @@ func (s *Server) Run() error {
 
 	ctx, shutdown := context.WithTimeout(context.Background(), ctxTimeout*time.Second)
 	defer shutdown()
-	s.logger.Info("Server Exited Properly")
+	slog.Info("Server Exited Properly")
 
 	return server.Shutdown(ctx)
 

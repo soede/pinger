@@ -6,20 +6,18 @@ import (
 	"docker/internal/containers"
 	"docker/internal/models"
 	"encoding/json"
-	"log/slog"
 	"net"
 	"net/http"
 	"strconv"
 )
 
 type containersHandlers struct {
-	cfg    *config.Config
-	conUC  containers.UseCase
-	logger slog.Logger
+	cfg   *config.Config
+	conUC containers.UseCase
 }
 
-func NewContainerHandlers(cfg *config.Config, conUC containers.UseCase, logger slog.Logger) containers.Handlers {
-	return &containersHandlers{cfg: cfg, conUC: conUC, logger: logger}
+func NewContainerHandlers(cfg *config.Config, conUC containers.UseCase) containers.Handlers {
+	return &containersHandlers{cfg: cfg, conUC: conUC}
 }
 
 func (h containersHandlers) GetAll() http.HandlerFunc {
@@ -96,7 +94,6 @@ func (h containersHandlers) SetAll() http.HandlerFunc {
 		if err := json.NewDecoder(r.Body).Decode(&list); err != nil {
 			http.Error(w, "invalid request body", http.StatusBadRequest)
 
-			h.logger.Info("err", err)
 			return
 		}
 

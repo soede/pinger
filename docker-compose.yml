@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     image: myhttp
     environment:
+      - 'env_name=local'
       - 'port=8080'
       - 'DB_HOST=db'
       - 'DB_PORT=5432'
