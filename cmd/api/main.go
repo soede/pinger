@@ -14,6 +14,7 @@ func main() {
 	cfg := config.LoadConfig()
 	slog.SetDefault(log.NewLogger(cfg))
 	slog.Debug(fmt.Sprintf("ReadTimeout: %d, WriteTimeout: %d", cfg.ReadTimeout, cfg.WriteTimeout))
+	//slog.Info("", slog.String("env_name", cfg.App.EnvName), slog.String())
 	db, err := postgres.NewPsqlDB(cfg)
 	if err != nil {
 		slog.Error("failed DB init", "Error: ", err)

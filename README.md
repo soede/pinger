@@ -24,6 +24,10 @@ db:
    user: "postgres"
    password: "somepassword"
    name: "postgres"
+   ssl: "verify-full"                # disable | require | verify-ca | verify-full
+   sslrootcert: "/path/to/root.crt"  # Корневой сертификат
+   sslcert: "/path/to/client.crt"    # Клиентский сертификат
+   sslkey: "/path/to/client.key"     # Приватный ключ
 ```
 !!! Сначала сервер проверяет, есть ли `config.yml` в корневой директории проекта, 
 если его нет – пытается загрузить данные из переменных окружения. \

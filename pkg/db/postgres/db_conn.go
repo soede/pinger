@@ -15,12 +15,17 @@ const (
 )
 
 func NewPsqlDB(c *config.Config) (*sqlx.DB, error) {
-	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
+	dataSourceName := fmt.Sprintf(
+		"host=%s port=%s user=%s dbname=%s sslmode=%s password=%s sslrootcert=%s sslcert=%s sslkey=%s",
 		c.DB.Host,
 		c.DB.Port,
 		c.DB.User,
 		c.DB.Name,
+		c.DB.SSL,
 		c.DB.Password,
+		c.DB.SSLRootCert,
+		c.DB.SSLCert,
+		c.DB.SSLKey,
 	)
 
 	db, err := sqlx.Open("postgres", dataSourceName)

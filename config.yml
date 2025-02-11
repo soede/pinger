@@ -1,5 +1,5 @@
 app:
-  env_name: "local" #local | staging | prod
+  env_name: "local" # local | staging | prod
   port: "8080"      #порт на котором будет запущен сервер
   readTimeout: 12   #(секунды) Если клиент не отправит полный запрос за указанное время, соединение будет закрыто
   writeTimeout: 12  #(секунды) Если сервер не успеет отправить ответ клиенту за указанное время, соединение закроется.
@@ -11,3 +11,7 @@ db:
   user: "postgres"
   password: "somepassword"
   name: "postgres"
+  ssl: "verify-full"                # disable | require | verify-ca | verify-full
+  sslrootcert: "/path/to/root.crt"  # Корневой сертификат
+  sslcert: "/path/to/client.crt"    # Клиентский сертификат
+  sslkey: "/path/to/client.key"     # Приватный ключ

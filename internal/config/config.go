@@ -4,6 +4,7 @@ import (
 	"docker/pkg/utils"
 	"fmt"
 	"gopkg.in/yaml.v3"
+	"log"
 	"os"
 )
 
@@ -22,22 +23,26 @@ type App struct {
 }
 
 type DB struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	Name     string `yaml:"name"`
+	Host        string `yaml:"host"`
+	Port        string `yaml:"port"`
+	User        string `yaml:"user"`
+	Password    string `yaml:"password"`
+	Name        string `yaml:"name"`
+	SSL         string `yaml:"ssl"`
+	SSLRootCert string `yaml:"sslrootcert"`
+	SSLCert     string `yaml:"sslcert"`
+	SSLKey      string `yaml:"sslkey"`
 }
 
 func LoadConfig() *Config {
 
 	if utils.FileExists(configPath) {
-		fmt.Println("Loading config from", configPath)
+		log.Println("Loading config from", configPath)
 		return loadFromFile(configPath)
 	} else {
 
 	}
-	fmt.Println("Config file not found. Loading from environment variables.")
+	log.Println("Config file not found. Loading from environment variables.")
 	return mustEnvConfig()
 }
 
@@ -88,19 +93,30 @@ func mustEnvConfig() *Config {
 		panic("DB_NAME should be defined in env configuration")
 	}
 
+	ssl := os.Getenv("SSL")
+	if ssl == "" {
+		ssl = "disable"
+	}
+	SSLRootCert := os.Getenv("SSLRootCert")
+	SSLCert := os.Getenv("SSLCert")
+	SSLKey := os.Getenv("SSLKey")
 	return &Config{
-		App{
+		App: App{
 			env,
 			port,
 			5,
 			5,
 		},
-		DB{
+		DB: DB{
 			host,
 			DBport,
 			user,
 			password,
 			name,
+			ssl,
+			SSLRootCert,
+			SSLCert,
+			SSLKey,
 		},
 	}
 }
