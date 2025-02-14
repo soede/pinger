@@ -52,10 +52,6 @@ func (s *Server) Run() error {
 		}
 	}()
 
-	/*go func() {
-		s.logger.Info("Starting Debug Server on PORT: ", s.cfg.App.PprofPort)
-	}()*/
-
 	if err := s.MapHandlers(); err != nil {
 		return err
 	}
