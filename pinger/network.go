@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func pingIP(ip string, timeout time.Duration) (float64, error) {
+func pingIP(ip string, timeout time.Duration) (time.Duration, error) {
 	pinger, err := ping.NewPinger(ip)
 	if err != nil {
 		return 0, fmt.Errorf("pinger.pingIP: failed to initialize pinger for IP %s: %w", ip, err)
@@ -43,7 +43,7 @@ func pingIP(ip string, timeout time.Duration) (float64, error) {
 		return 0, fmt.Errorf("pinger.pingIP: No received packets from %s", ip)
 	}
 	fmt.Println("packets: ", stats.PacketsRecv)
-	return float64(stats.AvgRtt.Milliseconds()), nil
+	return stats.AvgRtt, nil
 }
 
 func sendResult(ctx context.Context, results *[]PingResult, config Config) error {

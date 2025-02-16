@@ -40,10 +40,10 @@ const columns: TableProps<IContainer>['columns'] = [
         ),
     },
     {
-        title: "Время пинга (мс)",
+        title: "Время пинга (µs)",
         dataIndex: 'p_duration',
         key: 'p_duration',
-        render: (value: number) => value.toFixed(3),
+        render: (value: number) => `${(value / 1000).toFixed(3)}`,
     },
     {
         title: "Последний пинг",

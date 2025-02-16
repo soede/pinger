@@ -61,13 +61,6 @@ const App: React.FC = ({ }) => {
             <Layout style={layoutStyle}>
                 <Header style={headerStyle}>
                     <Title>Pinger</Title>
-                    {/*<Search
-                        placeholder="Введи IP или статус"
-                        onSearch={handleSearch}
-                        enterButton
-                    />*/}
-
-
                 </Header>
                 <Content style={contentStyle}>
                     <>

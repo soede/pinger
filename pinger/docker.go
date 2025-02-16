@@ -11,10 +11,10 @@ import (
 )
 
 type PingResult struct {
-	Status       string    `json:"container_status"`
-	Addr         string    `json:"addr"`
-	PingDuration float64   `json:"p_duration"`
-	PingedAt     time.Time `json:"pinged_at"`
+	Status       string        `json:"container_status"`
+	Addr         string        `json:"addr"`
+	PingDuration time.Duration `json:"p_duration"`
+	PingedAt     time.Time     `json:"pinged_at"`
 }
 
 func (pr *PingResult) Log() {
@@ -22,7 +22,7 @@ func (pr *PingResult) Log() {
 		slog.String("module", "pinger.eachContainers"),
 		slog.String("ip_address", pr.Addr),
 		slog.String("status", pr.Status),
-		slog.Float64("ping_time_ms", pr.PingDuration),
+		slog.Duration("ping_time_ms", pr.PingDuration),
 		slog.String("timestamp", pr.PingedAt.Format(time.RFC3339)),
 	)
 }
